@@ -1,4 +1,6 @@
-from tkinter import Tk, Button, filedialog, Listbox, PanedWindow, HORIZONTAL, END, messagebox, Checkbutton, IntVar
+import sys
+from tkinter import (Tk, Button, filedialog, Listbox, PanedWindow, HORIZONTAL, END,
+                     messagebox, Checkbutton, IntVar, Menu)
 from typing import List
 from merger import Merger
 
@@ -14,18 +16,40 @@ class Dragger:
             self.items = next_items
 
 
-class DraggableListbox(Listbox):
+class SmartListbox(Listbox):
     def __init__(self, *args, disable_flag=None, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+
+        self.menu = Menu(self, tearoff=0)
+        self.menu.add_command(label="Delete", command=self.delete_item)
+        self.bind('<Button-2>' if sys.platform == 'darwin' else '<Button-3>', self.show_menu)
         self.bind('<B1-Motion>', self.mouse_btn1_motion)
         self.bind('<ButtonRelease-1>', self.mouse_btn1_release)
         self.prev_pos = tuple()
-        self.disable_flag = disable_flag
+        self.disable_flag = disable_flag or IntVar()
 
     def insert_items(self, items):
         self.delete(0, END)
         for i, it in enumerate(items):
             self.insert(i, it)
+
+    def show_menu(self, event):
+        cur_pos = self.curselection()
+
+        if not cur_pos:
+            return
+
+        try:
+            self.menu.tk_popup(event.x_root, event.y_root)
+        finally:
+            self.menu.grab_release()
+
+    def delete_item(self, *_):
+        cur_pos = self.curselection()
+        if cur_pos:
+            items = self.get(0, END)
+            items = [it for i, it in enumerate(items) if i != cur_pos[0]]
+            self.insert_items(items)
 
     def mouse_btn1_motion(self, *_):
         cur_pos = self.curselection()
@@ -77,7 +101,7 @@ class App(Tk):
 
         self.checkbox.bind('<Button-1>', get_state)
 
-        self.listbox = DraggableListbox(self, height=18, disable_flag=checkbox_var)
+        self.listbox = SmartListbox(self, height=18, disable_flag=checkbox_var)
         self.listbox.grid(sticky='wens')
 
         bottom = PanedWindow(self, orient=HORIZONTAL, height=50)

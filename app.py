@@ -15,7 +15,6 @@ class Dragger:
 class DraggableListbox(Listbox):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.dragger = Dragger()
         self.bind('<B1-Motion>', self.mouse_btn1_motion)
         self.bind('<ButtonRelease-1>', self.mouse_btn1_release)
         self.prev_pos = tuple()

@@ -15,15 +15,12 @@ class Dragger:
 
 
 class DraggableListbox(Listbox):
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args, disable_flag=None, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.bind('<B1-Motion>', self.mouse_btn1_motion)
         self.bind('<ButtonRelease-1>', self.mouse_btn1_release)
         self.prev_pos = tuple()
-        self.is_disabled = False
-
-    def disable_dragging(self, val):
-        self.is_disabled = val
+        self.disable_flag = disable_flag
 
     def insert_items(self, items):
         self.delete(0, END)
@@ -34,7 +31,7 @@ class DraggableListbox(Listbox):
         cur_pos = self.curselection()
         prev_pos = self.prev_pos
 
-        if self.is_disabled:
+        if not self.disable_flag.get():
             return
 
         if len(prev_pos) > 0 and len(cur_pos) > 0:
@@ -44,7 +41,6 @@ class DraggableListbox(Listbox):
                 self.insert_items(dragger.items)
                 self.selection_set(cur_pos[0])
 
-        print('>>>', self.is_disabled)
         self.config(cursor='exchange')
         self.prev_pos = cur_pos
 
@@ -71,22 +67,17 @@ class App(Tk):
         self.button.place(relx=0, rely=0.5, anchor='w')
 
         checkbox_var = IntVar()
-        self.checkbox = Checkbutton(top, text='Rearrange items', state='disabled', variable=checkbox_var)
+        self.checkbox = Checkbutton(top, text='Rearrange items', variable=checkbox_var)
         self.checkbox.pack()
-        self.checkbox_disabled = True
         self.chekbox_checked = checkbox_var.get()
 
         def get_state(*_):
-            if self.checkbox_disabled:
-                return
-
             self.chekbox_checked = int(not checkbox_var.get())
             self.listbox.configure(state='disabled' if not self.chekbox_checked else 'normal')
-            self.listbox.disable_dragging(self.chekbox_checked)
 
         self.checkbox.bind('<Button-1>', get_state)
 
-        self.listbox = DraggableListbox(self, height=18)
+        self.listbox = DraggableListbox(self, height=18, disable_flag=checkbox_var)
         self.listbox.grid(sticky='wens')
 
         bottom = PanedWindow(self, orient=HORIZONTAL, height=50)
@@ -118,7 +109,6 @@ class App(Tk):
         files = filedialog.askopenfilenames(filetypes=[('PDF files', '*.pdf')])
 
         if files:
-            self.checkbox.config(state='normal')
-            self.checkbox_disabled = False
+            self.listbox.configure(state='normal')
             self.listbox.insert_items(files)
             self.listbox.configure(state='disabled' if not self.chekbox_checked else 'normal')

@@ -4,7 +4,8 @@ from pathlib import Path
 
 
 class Merger(PdfWriter):
-    def __init__(self, fileobj: str | IO[Any] = "", clone_from: None | PdfReader | str | IO[Any] | Path = None, pdf_files = [], pdf_dir = '') -> None:
+    def __init__(self, fileobj: str | IO[Any] = "", clone_from: None | PdfReader | str | IO[Any] | Path = None,
+                 pdf_files=[], pdf_dir='') -> None:
         super().__init__(fileobj, clone_from)
         self.__merge_pdfs(pdf_files, pdf_dir)
 

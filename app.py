@@ -2,6 +2,7 @@ from tkinter import Tk, Button, filedialog, Listbox, PanedWindow, HORIZONTAL, EN
 from typing import List
 from merger import Merger
 
+
 class Dragger:
     def __init__(self, items: List[str] = []):
         self.items = items
@@ -12,6 +13,7 @@ class Dragger:
             next_items.insert(new_pos, self.items[old_pos])
             self.items = next_items
 
+
 class DraggableListbox(Listbox):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
@@ -21,7 +23,7 @@ class DraggableListbox(Listbox):
         self.is_disabled = False
 
     def disable_dragging(self, val):
-        self.is_disabled = val    
+        self.is_disabled = val
 
     def insert_items(self, items):
         self.delete(0, END)
@@ -49,13 +51,15 @@ class DraggableListbox(Listbox):
     def mouse_btn1_release(self, *_):
         self.config(cursor='arrow')
         self.prev_pos = tuple()
-    
-class App(Tk):
-    def __init__(self, screenName: str | None = None, baseName: str | None = None, className: str = "Tk", useTk: bool = True, sync: bool = False, use: str | None = None) -> None:
-        super().__init__(screenName, baseName, className, useTk, sync, use)
-        self.renderUI()
 
-    def renderUI(self):
+
+class App(Tk):
+    def __init__(self, screenName: str | None = None, baseName: str | None = None, className: str = "Tk",
+                 useTk: bool = True, sync: bool = False, use: str | None = None) -> None:
+        super().__init__(screenName, baseName, className, useTk, sync, use)
+        self.render_ui()
+
+    def render_ui(self):
         self.geometry('500x400')
         self.title('PDF merge')
         self.grid_columnconfigure(0, weight=1)
@@ -63,7 +67,7 @@ class App(Tk):
         top = PanedWindow(self, orient=HORIZONTAL, height=50)
         top.grid(sticky='we')
 
-        self.button = Button(top, text='Add files', command=self.open_dialog)        
+        self.button = Button(top, text='Add files', command=self.open_dialog)
         self.button.place(relx=0, rely=0.5, anchor='w')
 
         checkbox_var = IntVar()
@@ -71,25 +75,23 @@ class App(Tk):
         self.checkbox.pack()
         self.checkbox_disabled = True
         self.chekbox_checked = checkbox_var.get()
-        
+
         def get_state(*_):
             if self.checkbox_disabled:
                 return
-            
+
             self.chekbox_checked = int(not checkbox_var.get())
             self.listbox.configure(state='disabled' if not self.chekbox_checked else 'normal')
             self.listbox.disable_dragging(self.chekbox_checked)
-            
-
 
         self.checkbox.bind('<Button-1>', get_state)
-     
+
         self.listbox = DraggableListbox(self, height=18)
         self.listbox.grid(sticky='wens')
 
         bottom = PanedWindow(self, orient=HORIZONTAL, height=50)
         bottom.grid(sticky='we')
-  
+
         self.merge_button = Button(bottom, text='Merge', command=self.save_dialog)
         self.merge_button.place(relx=0, rely=0.5, anchor='w')
 
@@ -98,7 +100,8 @@ class App(Tk):
         pdf_files = self.listbox.get(0, END)
 
         if pdf_files:
-            output_file = filedialog.asksaveasfilename(initialfile='result', defaultextension='.pdf', filetypes=[('PDF files', '*.pdf')])
+            output_file = filedialog.asksaveasfilename(initialfile='result', defaultextension='.pdf',
+                                                       filetypes=[('PDF files', '*.pdf')])
             if output_file:
                 merger = Merger(pdf_files=pdf_files)
                 merger.write_to_file(output_file)
@@ -113,12 +116,9 @@ class App(Tk):
 
     def open_dialog(self, *_):
         files = filedialog.askopenfilenames(filetypes=[('PDF files', '*.pdf')])
-        
+
         if files:
             self.checkbox.config(state='normal')
             self.checkbox_disabled = False
             self.listbox.insert_items(files)
             self.listbox.configure(state='disabled' if not self.chekbox_checked else 'normal')
-
-            
-

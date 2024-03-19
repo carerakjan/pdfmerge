@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, filedialog, Listbox, PanedWindow, HORIZONTAL, CENTER, END
+from tkinter import Tk, Label, Button, filedialog, Listbox, PanedWindow, HORIZONTAL, CENTER, END, messagebox
 from merger import Merger
 import shutil
 
@@ -35,10 +35,14 @@ class App(Tk):
             if output_file:
                 merger.merge_pdfs(self.pdf_files)
                 merger.write_to_file(output_file)
+                messagebox.showinfo('Result', 'Done!')
+            else:
+                messagebox.showwarning('Canceled', 'Merge is not completed')
             merger.close()
-            self.title('PDF merge: ' + ('DONE!' if output_file else 'CANCELED - merge is not completed'))
         else:
-            self.title('PDF merge: CANCELED - no one files selected')
+            messagebox.showerror('Canceled', 'No one files selected')
+
+        self.title('PDF merge')
    
 
     def __open_dialog(self, *_):

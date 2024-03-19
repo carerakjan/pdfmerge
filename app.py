@@ -31,7 +31,6 @@ class DraggableListbox(Listbox):
 
         if len(prev_pos) > 0 and len(cur_pos) > 0:
             if abs(cur_pos[0] - prev_pos[0]) == 1:
-                print(abs(cur_pos[0] - prev_pos[0]))
                 dragger = Dragger(self.get(0, END))
                 dragger.move(prev_pos[0], cur_pos[0])
                 self.insert_items(dragger.items)
@@ -47,7 +46,6 @@ class App(Tk):
     def __init__(self, screenName: str | None = None, baseName: str | None = None, className: str = "Tk", useTk: bool = True, sync: bool = False, use: str | None = None) -> None:
         super().__init__(screenName, baseName, className, useTk, sync, use)
         self.renderUI()
-        self.pdf_files = None
 
     def renderUI(self):
         self.geometry('500x400')
@@ -68,11 +66,13 @@ class App(Tk):
 
     def save_dialog(self, *_):
         self.title('PDF merge: PROCESSING...')
-        if self.pdf_files:
+        pdf_files = self.listbox.get(0, END)
+
+        if pdf_files:
             merger = Merger()
             output_file = filedialog.asksaveasfilename(initialfile='result', defaultextension='.pdf', filetypes=[('PDF files', '*.pdf')])
             if output_file:
-                merger.merge_pdfs(self.pdf_files)
+                merger.merge_pdfs(pdf_files)
                 merger.write_to_file(output_file)
                 messagebox.showinfo('Result', 'Done!')
             else:
@@ -84,7 +84,7 @@ class App(Tk):
         self.title('PDF merge')
 
     def open_dialog(self, *_):
-        files = self.pdf_files = filedialog.askopenfilenames(filetypes=[('PDF files', '*.pdf')])
+        files = filedialog.askopenfilenames(filetypes=[('PDF files', '*.pdf')])
         
         if files:
             self.listbox.insert_items(files)

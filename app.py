@@ -41,6 +41,7 @@ class DraggableListbox(Listbox):
 
     def mouse_btn1_release(self, *_):
         self.config(cursor='arrow')
+        self.prev_pos = tuple()
     
 class App(Tk):
     def __init__(self, screenName: str | None = None, baseName: str | None = None, className: str = "Tk", useTk: bool = True, sync: bool = False, use: str | None = None) -> None:

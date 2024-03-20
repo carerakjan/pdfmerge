@@ -1,7 +1,14 @@
 from tkinter import (Tk, Button, filedialog, PanedWindow, HORIZONTAL, END,
-                     messagebox, Checkbutton, IntVar)
+                     messagebox, Checkbutton, IntVar, PhotoImage)
 from merger import Merger
 from smlistbox import SmartListbox
+from favicon import icon_b64
+
+# with open('favicon.png', 'rb') as file:
+#     icon_converted = base64.b64encode(file.read())
+
+# with open('favicon.txt', 'wb') as file:
+#     file.write(icon_converted)
 
 
 class App(Tk):
@@ -14,6 +21,7 @@ class App(Tk):
         self.geometry('500x400')
         self.title('PDF merge')
         self.grid_columnconfigure(0, weight=1)
+        self.iconphoto(False, PhotoImage(data=icon_b64))
 
         top = PanedWindow(self, orient=HORIZONTAL, height=50)
         top.grid(sticky='we')
